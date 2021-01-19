@@ -16,13 +16,18 @@ class FlightsController < ApplicationController
     render json: @flight
   end
 
+  def get_all_flights
+    flights = Flight.all.order(:cost)
+    return render json: {"flights": flights.limit(@@page_size).offset((params[:page].to_i-1)* @@page_size ), "count": flights.length}, status: 200
+  end
+
   #POST /get_filtered_flights
   def get_filtered_flights
     journey_data = {}
     if(params[:type] == 0)
-      journey_data[:one_way] = Flight.find_flights_with_params(params)
+      journey_data = Flight.find_flights_with_params(params)
     else
-      journey_data[:two_way] = Flight.find_two_way_flights_with_params(params)
+      journey_data = Flight.find_two_way_flights_with_params(params)
     end
     return render json: journey_data, status: 200
   end
@@ -55,11 +60,11 @@ class FlightsController < ApplicationController
   private
     def validate_search_params
       if(!params.has_key?(:source) || !params.has_key?(:destination))
-        return render json:{"message": "Bad Request => source or destination is missing"}, status: 400
+        return render json:{"error": "Bad Request => source or destination is missing"}, status: 400
       end
-      #return render json:{"message": "Bad Request => arrival/departure times are messed up"}, status: 400 if((!params.has_key?(:arrival) && !params.has_key?(:departure)) && DateTime.parse(params[:arrival]) <DateTime.parse(params[:departure]))
-      return render json:{"message": "Bad Request => journey 'type'/'passenger_count'/'page' missing "}, status: 400 if(!params.has_key?(:type) || !params.has_key?(:passenger_count) || !params.has_key?(:page))
-      return render json:{"message": "Bad Request => return datetime is needed for round trip"}, status: 400 if(params[:type] == 1 && !params.has_key?(:return))
+      return render json:{"error": "Bad Request => journey 'type'/'passenger_count'/'page' missing "}, status: 400 if(!params.has_key?(:type) || !params.has_key?(:passenger_count) || !params.has_key?(:page))
+      return render json:{"error": "Bad Request => return datetime is needed for round trip"}, status: 400 if(params[:type] == 1 && !params.has_key?(:return))
+      return render json:{"error": "Bad Request => return is less than departure"}, status: 400 if(params[:type] == 1 && DateTime.parse(params[:return]) < DateTime.parse(params[:departure]))
     end
 
     # Use callbacks to share common setup or constraints between actions.

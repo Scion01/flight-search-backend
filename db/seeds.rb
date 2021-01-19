@@ -33,6 +33,18 @@ cities = [
     {
         :short_name => "NAG",
         :full_name => "NAGPUR"
+    },
+    {
+        :short_name => "LKO",
+        :full_name => "LUCKNOW"
+    },
+    {
+        :short_name => "IDR",
+        :full_name => "INDORE"
+    },
+    {
+        :short_name => "JAI",
+        :full_name => "JAIPUR"
     }
 ]
 
@@ -70,22 +82,6 @@ airplanes = [
     },
     {
         :model => "2A124",
-        :tail_number => SecureRandom.hex(5)
-    },
-    {
-        :model => "2A124",
-        :tail_number => SecureRandom.hex(5)
-    },
-    {
-        :model => "2A125",
-        :tail_number => SecureRandom.hex(5)
-    },
-    {
-        :model => "2A123",
-        :tail_number => SecureRandom.hex(5)
-    },
-    {
-        :model => "2A125",
         :tail_number => SecureRandom.hex(5)
     }
 ]
@@ -134,13 +130,39 @@ end
 all_cities_count = City.all.count
 all_cities = City.all.pluck(:id)
 
+# Airplane.all.each do |airplane|
+#     20.times{
+#         departure = rand_departure_time(get_rand_in_range(1,30).days.from_now)
+#         arrival = departure + arrival_offset().hours
+#         source = all_cities[get_rand_in_range(0,all_cities_count)]
+#         destination = all_cities[(source + 1) % all_cities_count]
+#         Flight.create(:flight_no => SecureRandom.hex(5), :departure => departure, :arrival => arrival, :seats => get_rand_in_range(40,80), 
+#         :source => source, :destination => destination, :airplanes_id => airplane.id )
+#         #forcefully add a return journey for each source and dest
+#         departure = arrival + get_rand_in_range(1,5).days + get_rand_in_range(1,7).hours
+#         arrival = departure + arrival_offset().hours
+#         Flight.create(:flight_no => SecureRandom.hex(5), :departure => departure , :arrival => arrival, :seats => get_rand_in_range(40,80), 
+#         :source => destination, :destination => source, :airplanes_id => airplane.id )
+#     }
+# end
+
+#the above random way of generating flights was a mistake....
+
+unique_pairs = all_cities.combination(2).to_a
 Airplane.all.each do |airplane|
-    2.times{
-        departure = rand_departure_time(get_rand_in_range(1,3).days.from_now)
-        arrival = departure + arrival_offset().hours
-        source = all_cities[get_rand_in_range(0,all_cities_count)]
-        destination = all_cities[(source + 1) % all_cities_count]
-        Flight.create(:flight_no => SecureRandom.hex(5), :departure => departure, :arrival => arrival, :seats => get_rand_in_range(40,80), 
-        :source => source, :destination => destination, :airplanes_id => airplane.id )
-    }
+    unique_pairs.each do |city_pair|
+        get_rand_in_range(1,3).times{
+            departure = rand_departure_time(get_rand_in_range(1,30).days.from_now)
+            arrival = departure + arrival_offset().hours
+            source = city_pair[0]
+            destination = city_pair[1]
+            Flight.create(:flight_no => SecureRandom.hex(5), :departure => departure, :arrival => arrival, :seats => get_rand_in_range(40,80), 
+            :source => source, :destination => destination, :airplanes_id => airplane.id, :cost => get_rand_in_range(1200,4000) )
+            #forcefully add a return journey for each source and dest
+            departure = arrival + get_rand_in_range(0,2).days + get_rand_in_range(1,7).hours
+            arrival = departure + arrival_offset().hours
+            Flight.create(:flight_no => SecureRandom.hex(5), :departure => departure , :arrival => arrival, :seats => get_rand_in_range(40,80), 
+            :source => destination, :destination => source, :airplanes_id => airplane.id, :cost => get_rand_in_range(1200,4000) )
+        }
+    end
 end

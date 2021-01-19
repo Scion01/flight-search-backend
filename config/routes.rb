@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   resources :airlines
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   post 'get_filtered_flights', to: 'flights#get_filtered_flights'
+  get 'get_all_flights/:page', to: 'flights#get_all_flights'
 end
