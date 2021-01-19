@@ -83,6 +83,14 @@ airplanes = [
     {
         :model => "2A124",
         :tail_number => SecureRandom.hex(5)
+    },
+    {
+        :model => "2A124",
+        :tail_number => SecureRandom.hex(5)
+    },
+    {
+        :model => "2A124",
+        :tail_number => SecureRandom.hex(5)
     }
 ]
 

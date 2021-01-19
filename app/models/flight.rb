@@ -9,7 +9,7 @@ class Flight < ApplicationRecord
     @@page_size = 5
 
     def self.find_two_way_flights_with_params(params)
-        query_string = " flights.source = ? AND flights.destination = ? AND flights.departure >= ? AND f1.arrival <= ? AND flights.seats >= ? AND f1.seats >= ?"
+        query_string = " flights.source = ? AND flights.destination = ? AND flights.departure >= ? AND f1.arrival <= ? AND f1.departure > flights.arrival AND flights.seats >= ? AND f1.seats >= ?"
         query_args = [params[:source].to_i,params[:destination].to_i,DateTime.parse(params[:departure]),DateTime.parse(params[:return]),params[:passenger_count],params[:passenger_count]]
         if(params.has_key?(:price_low))
             query_string += " AND flights.cost+f1.cost >= ?"
